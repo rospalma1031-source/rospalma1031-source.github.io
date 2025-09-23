@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio Artístico</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Lato', sans-serif;
+            color: #2d3748; /* Color de texto oscuro para buen contraste */
+            overflow-x: hidden; /* Evita el scroll horizontal */
+            /* Degradado de fondo con la nueva paleta de colores OSCURA */
+            background-color: #1a1a2e; /* Azul noche muy oscuro */
+            background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
+                              radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+        }
+        
+        /* Estilos para el canvas de fondo */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Mueve el canvas al fondo */
+            filter: blur(2px) saturate(1.5);
+        }
+
+        /* Asegura que el contenido esté por encima del canvas */
+        header, main, footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Oculta la navegación del móvil por defecto */
+        #mobile-menu {
+            display: none;
+        }
+
+        /* Usa Cherry Bomb One para títulos y elementos clave */
+        .font-cherry-bomb {
+            font-family: 'Cherry Bomb One', cursive;
+        }
+        
+        /* Adaptación para móviles */
+        @media (max-width: 768px) {
+            /* Puedes agregar estilos específicos para móvil si es necesario */
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <canvas id="background-canvas"></canvas>
+
+    <header id="main-header" class="p-4 md:p-8 flex justify-between items-center fixed top-0 left-0 w-full z-50 bg-white/10 backdrop-blur-lg shadow-md transition-colors duration-300">
+        <a href="../">
+        <img src="https://static.wixstatic.com/media/580988_e4bd8fcb96e84f23bd7aa4a14ad59e89~mv2.png" alt="Logo Mi Portafolio" class="h-10 md:h-12">
+        </a>
+        
+        <nav class="hidden md:block">
+            <ul class="flex items-center space-x-4 md:space-x-8 text-lg font-medium">
+                <li><a href="../#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">SOBRE MI</a></li>
+                <li class="relative">
+                    <a href="../#proyectos" id="proyectos-desktop-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase cursor-pointer">PROYECTOS</a>
+                    <ul id="proyectos-desktop-submenu" class="absolute hidden bg-white/20 backdrop-blur-lg rounded-lg mt-2 py-2 w-48 shadow-lg">
+                        <li><a href="../okatek/" class="block px-4 py-2 text-white hover:bg-white/10">OKATEK</a></li>
+                        <li><a href="../eldepci/" class="block px-4 py-2 text-white hover:bg-white/10">ELDEPCI</a></li>
+                        <li><a href="../core/" class="block px-4 py-2 text-white hover:bg-white/10">CORE</a></li>
+                        <li><a href="../impulso/" class="block px-4 py-2 text-white hover:bg-white/10">IMPULSO</a></li>
+                        <li><a href="../arago/" class="block px-4 py-2 text-white hover:bg-white/10">ARAGO</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">CONTACTO</a></li>
+            </ul>
+        </nav>
+        
+        <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+    </header>
+
+    <nav id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-[#29287B] z-40 p-8 text-center flex flex-col justify-center items-center space-y-8">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-white text-3xl focus:outline-none">&times;</button>
+        <ul class="flex flex-col space-y-8 text-2xl font-medium">
+            <li><a href="../#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">SOBRE MI</a></li>
+            <li>
+                <a href="../#proyectos" id="proyectos-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">PROYECTOS</a>
+                <ul id="proyectos-submenu" class="hidden mt-4 space-y-4 text-xl">
+                    <li><a href="../okatek/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">OKATEK</a></li>
+                    <li><a href="../eldepci/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">ELDEPCI</a></li>
+                    <li><a href="../core/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">CORE</a></li>
+                    <li><a href="../impulso/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">IMPULSO</a></li>
+                    <li><a href="../arago/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">ARAGO</a></li>
+                </ul>
+            </li>
+            <li><a href="../#contacto" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">CONTACTO</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <div class="container mx-auto px-4 pt-24 md:pt-32">
+            
+            <section id="portada" class="mb-16 md:mb-24">
+                <img src="https://static.wixstatic.com/media/580988_571e6cb12e8341c486f7c29fdc845c7c~mv2.png" alt="Imagen de portada de Okatek" class="w-full h-auto rounded-3xl">
+            </section>
+
+            <!-- IDENTIDAD VISUAL -->
+            <section id="descripcion" class="mb-16 md:mb-24">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 max-w-4xl mx-auto">
+                    <img src="https://static.wixstatic.com/media/580988_a6edad4ad9dd43afa41a2c63dd663616~mv2.png" alt="Imagen de perfil" class="w-48 md:w-60 h-auto flex-shrink-0">
+                    <div class="text-lg text-center md:text-left space-y-4">
+                        <p>El reto consistió en alinear la imagen de una agencia galardonada con su reputación, consolidando una marca que proyectara su liderazgo y profesionalismo.</p>
+                        <p>Fui responsable del desarrollo de la identidad visual de la agencia, asegurando que cada elemento gráfico comunicara de manera clara su experiencia, sus valores. Mi trabajo fue crucial para dotar a la agencia de una imagen coherente y memorable, que se distinguiera en un sector altamente competitivo.</p>
+                        <p>Se logró una marca más sólida y consistente, que refuerza su reputación como referente en el sector y mejora su posicionamiento ante clientes potenciales.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="max-w-4xl mx-auto">
+                <section>
+                     <img src="https://static.wixstatic.com/media/580988_5bcb05ebc80c4a54b2ee440791255f80~mv2.png" alt="Imagen complementaria" class="w-full h-auto rounded-t-3xl">
+                     <video class="w-full h-auto" autoplay loop muted playsinline>
+                        <source src="https://video.wixstatic.com/video/580988_e017bbf098a6404f908b689f0239a545/1080p/mp4/file.mp4" type="video/mp4">
+                        Tu navegador no soporta el tag de video.
+                    </video>
+                    <video class="w-full h-auto rounded-b-3xl" autoplay loop muted playsinline>
+                        <source src="https://video.wixstatic.com/video/580988_65c4179356aa49439a1f7a7eee5f3dee/1080p/mp4/file.mp4" type="video/mp4">
+                        Tu navegador no soporta el tag de video.
+                    </video>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-8">
+        <p class="text-sm text-gray-400">© 2024 Mi Portafolio. Todos los derechos reservados.</p>
+        <p class="text-sm text-gray-400">Diseñado y desarrollado con ♥</p>
+    </footer>
+
+
+    <script>
+        // --- Menú de hamburguesa ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMenuButton = document.getElementById('close-menu-button');
+        mobileMenuButton.addEventListener('click', () => { mobileMenu.style.display = 'flex'; });
+        closeMenuButton.addEventListener('click', () => { mobileMenu.style.display = 'none'; });
+        function closeMobileMenu() { 
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.style.display = 'none';
+            }
+        }
+
+        // --- Submenú de proyectos en MÓVIL ---
+        const proyectosToggle = document.getElementById('proyectos-toggle');
+        const proyectosSubmenu = document.getElementById('proyectos-submenu');
+        if(proyectosToggle && proyectosSubmenu) {
+            proyectosToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                proyectosSubmenu.classList.toggle('hidden');
+            });
+        }
+
+        // --- Submenú de proyectos en ESCRITORIO ---
+        const proyectosDesktopToggle = document.getElementById('proyectos-desktop-toggle');
+        const proyectosDesktopSubmenu = document.getElementById('proyectos-desktop-submenu');
+        if(proyectosDesktopToggle && proyectosDesktopSubmenu) {
+            proyectosDesktopToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                proyectosDesktopSubmenu.classList.toggle('hidden');
+            });
+
+            // Opcional: cerrar el menú si se hace clic fuera de él
+            document.addEventListener('click', (e) => {
+                if (!proyectosDesktopToggle.contains(e.target) && !proyectosDesktopSubmenu.contains(e.target)) {
+                    proyectosDesktopSubmenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- Fondo dinámico ---
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const particleCount = 10;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        
+        function getRandomColor() {
+            const colors = [[204, 163, 197], [97, 46, 122], [100, 176, 217], [41, 40, 123]];
+            return `rgba(${colors[Math.floor(Math.random() * colors.length)].join(',')}, 0.3)`;
+        }
+
+        function createParticle() {
+            const radius = Math.random() * 80 + 150;
+            return {
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 1, vy: (Math.random() - 0.5) * 1,
+                color: getRandomColor(), radius: radius, targetRadius: radius,
+                expansionFactor: 1.5, smoothFactor: 0.05
+            };
+        }
+
+        function init() {
+            particles.length = 0;
+            for (let i = 0; i < particleCount; i++) particles.push(createParticle());
+        }
+
+        function drawParticle(p) {
+            ctx.beginPath();
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+            gradient.addColorStop(0, `rgba(255, 255, 255, 0.4)`);
+            gradient.addColorStop(0.5, p.color);
+            gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
+            ctx.fillStyle = gradient;
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < -p.radius) p.x = canvas.width + p.radius;
+                if (p.x > canvas.width + p.radius) p.x = -p.radius;
+                if (p.y < -p.radius) p.y = canvas.height + p.radius;
+                if (p.y > canvas.height + p.radius) p.y = -p.radius;
+                
+                p.radius += (p.targetRadius - p.radius) * p.smoothFactor;
+
+                drawParticle(p);
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = function() {
+            resizeCanvas();
+            animate();
+        };
+
+    </script>
+
+</body>
+</html>
+
+
