@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Okatek</title>
+    <title>Proyecto OKATEK</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,8 @@
             background-color: #1a1a2e; /* Azul noche muy oscuro */
             background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
                               radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
         
         /* Estilos para el canvas de fondo */
@@ -568,13 +570,36 @@
         }
 
         window.onload = function() {
+            // Activa el fundido de entrada al cargar la página
+            document.body.style.opacity = '1';
+
             resizeCanvas();
             animate();
+            
+            // Agrega el fundido de salida al hacer clic en un enlace
+            document.querySelectorAll('a[href]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const destination = this.getAttribute('href');
+                    
+                    // Excluye los enlaces que solo abren el submenú de proyectos
+                    if (this.id === 'proyectos-desktop-toggle' || this.id === 'proyectos-toggle') {
+                        return;
+                    }
+                    
+                    // Se aplica solo a enlaces que navegan, no a anclas en la misma página o disparadores JS
+                    if (destination && !destination.startsWith('#')) {
+                        e.preventDefault(); // Previene la navegación inmediata
+                        document.body.style.opacity = '0'; // Inicia el fundido de salida
+                        setTimeout(() => {
+                            window.location.href = destination; // Navega después del fundido
+                        }, 500); // Debe coincidir con la duración de la transición en CSS
+                    }
+                });
+            });
         };
 
     </script>
 
 </body>
 </html>
-
 
