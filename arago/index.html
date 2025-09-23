@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Arago</title>
+    <title>Proyecto ARAGO</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,12 @@
             background-color: #1a1a2e; /* Azul noche muy oscuro */
             background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
                               radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+            opacity: 0; /* Inicia transparente para el efecto de fundido */
+            transition: opacity 0.5s ease-in-out; /* Define la animación de fundido */
+        }
+
+        body.fade-in {
+            opacity: 1; /* Clase para hacer visible el contenido */
         }
         
         /* Estilos para el canvas de fondo */
@@ -491,6 +497,7 @@
         }
 
         window.onload = function() {
+            document.body.classList.add('fade-in'); // Activa el fundido de entrada cuando la página carga
             resizeCanvas();
             animate();
         };
@@ -503,14 +510,28 @@
             }, { once: true });
         });
 
+        // --- Transición de fundido al salir de la página ---
+        const linksToFade = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+        linksToFade.forEach(link => {
+            link.addEventListener('click', e => {
+                // Permite abrir en nueva pestaña con Ctrl/Cmd + Click
+                if (e.ctrlKey || e.metaKey) {
+                    return;
+                }
+                
+                e.preventDefault(); // Evita la navegación inmediata
+                const destination = link.href;
+                document.body.classList.remove('fade-in'); // Inicia la animación de salida
+                
+                // Espera a que termine la animación antes de cambiar de página
+                setTimeout(() => {
+                    window.location.href = destination;
+                }, 500); // La duración debe coincidir con la transición de CSS
+            });
+        });
+
     </script>
 
 </body>
 </html>
-
-
-
-
-
-
 
