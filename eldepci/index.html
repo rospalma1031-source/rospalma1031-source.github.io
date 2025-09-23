@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Eldepci</title>
+    <title>Proyecto ELDEPCI</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,8 @@
             background-color: #1a1a2e; /* Azul noche muy oscuro */
             background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
                               radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
         
         /* Estilos para el canvas de fondo */
@@ -44,6 +46,11 @@
         /* Oculta la navegación del móvil por defecto */
         #mobile-menu {
             display: none;
+        }
+
+        /* Clase para la transición de fundido */
+        .fade-in {
+            opacity: 1;
         }
 
         /* Usa Cherry Bomb One para títulos y elementos clave */
@@ -551,9 +558,48 @@
             animate();
         };
 
+        // --- Transición de fundido (fade) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Agrega una clase al body cuando la página está cargada para activar el fundido de entrada
+            document.body.classList.add('fade-in');
+        });
+
+        // Agrega un efecto de fundido de salida al navegar a otra página
+        document.querySelectorAll('a[href]').forEach(link => {
+            // Excluye enlaces que son solo marcadores de posición o activadores de scripts
+            if (link.getAttribute('href') === '#' || link.protocol === 'javascript:') {
+                return;
+            }
+
+            // Comprueba si es un enlace externo
+            const isExternal = link.hostname !== window.location.hostname;
+            
+            // Comprueba si es un enlace a una página diferente (no solo un cambio de ancla en la misma página)
+            const isDifferentPage = link.pathname !== window.location.pathname || link.search !== window.location.search;
+
+            if (isExternal || isDifferentPage) {
+                link.addEventListener('click', function(e) {
+                    // Si otro script ya ha prevenido la acción por defecto, no hacer nada
+                    if (e.defaultPrevented) {
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    const destination = this.href;
+                    
+                    // Elimina la clase fade-in para activar la transición de fundido de salida
+                    document.body.classList.remove('fade-in');
+                    
+                    // Espera a que la transición se complete antes de navegar
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 500); // Esta duración debe coincidir con la duración de la transición en CSS
+                });
+            }
+        });
+
     </script>
 
 </body>
 </html>
-
 
