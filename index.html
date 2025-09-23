@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio Colorido - Mi Nombre</title>
+    <!-- Incluye las fuentes 'Cherry Bomb One' y 'Lato' -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Incluye el CDN de Tailwind CSS para un estilo rápido y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Lato', sans-serif;
+            color: #2d3748; /* Color de texto oscuro para buen contraste */
+            overflow-x: hidden; /* Evita el scroll horizontal */
+            /* Degradado de fondo con la nueva paleta de colores OSCURA */
+            background-color: #1a1a2e; /* Azul noche muy oscuro */
+            background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
+                              radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+        }
+        
+        /* Estilos para el canvas de fondo */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Mueve el canvas al fondo */
+            filter: blur(2px) saturate(1.5);
+        }
+
+        /* Asegura que el contenido esté por encima del fondo */
+        header, main, footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Usa Cherry Bomb One para títulos y elementos clave */
+        .font-cherry-bomb {
+            font-family: 'Cherry Bomb One', cursive;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Canvas para el fondo dinámico -->
+    <canvas id="background-canvas"></canvas>
+
+    <!-- Sección de Encabezado (Header) -->
+    <header id="main-header" class="p-4 md:p-8 flex justify-between items-center fixed top-0 left-0 w-full z-50 bg-white/10 backdrop-blur-lg shadow-md transition-colors duration-300">
+        <a href="#portada">
+            <img src="https://static.wixstatic.com/media/580988_e4bd8fcb96e84f23bd7aa4a14ad59e89~mv2.png" alt="Logo Mi Portafolio" class="h-10 md:h-12">
+        </a>
+        <nav class="hidden md:block">
+            <ul class="flex items-center space-x-4 md:space-x-8 text-lg font-medium">
+                <li><a href="#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">SOBRE MI</a></li>
+                <li class="relative">
+                    <a href="#proyectos" id="proyectos-desktop-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase cursor-pointer">PROYECTOS</a>
+                    <ul id="proyectos-desktop-submenu" class="absolute hidden bg-white/20 backdrop-blur-lg rounded-lg mt-2 py-2 w-48 shadow-lg">
+                        <li><a href="okatek/" class="block px-4 py-2 text-white hover:bg-white/10">OKATEK</a></li>
+                        <li><a href="eldepci/" class="block px-4 py-2 text-white hover:bg-white/10">ELDEPCI</a></li>
+                        <li><a href="core/" class="block px-4 py-2 text-white hover:bg-white/10">CORE</a></li>
+                        <li><a href="impulso/" class="block px-4 py-2 text-white hover:bg-white/10">IMPULSO</a></li>
+                        <li><a href="arago/" class="block px-4 py-2 text-white hover:bg-white/10">ARAGO</a></li>
+                    </ul>
+                </li>
+                <li><a href="#contacto" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">CONTACTO</a></li>
+            </ul>
+        </nav>
+        <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Menú de navegación desplegable para móvil -->
+    <nav id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-[#29287B] z-40 p-8 text-center hidden flex-col justify-center items-center space-y-8">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-white text-3xl focus:outline-none">&times;</button>
+        <ul class="flex flex-col space-y-8 text-2xl font-medium">
+            <li><a href="#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">Sobre mí</a></li>
+            <li>
+                <a href="#proyectos" id="proyectos-mobile-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">Proyectos</a>
+                <ul id="proyectos-mobile-submenu" class="hidden mt-4 space-y-4">
+                    <li><a href="okatek/" class="text-white/80 hover:text-white text-xl" onclick="closeMobileMenu()">OKATEK</a></li>
+                    <li><a href="eldepci/" class="text-white/80 hover:text-white text-xl" onclick="closeMobileMenu()">ELDEPCI</a></li>
+                    <li><a href="core/" class="text-white/80 hover:text-white text-xl" onclick="closeMobileMenu()">CORE</a></li>
+                    <li><a href="impulso/" class="text-white/80 hover:text-white text-xl" onclick="closeMobileMenu()">IMPULSO</a></li>
+                    <li><a href="arago/" class="text-white/80 hover:text-white text-xl" onclick="closeMobileMenu()">ARAGO</a></li>
+                </ul>
+            </li>
+            <li><a href="#contacto" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">Contacto</a></li>
+        </ul>
+    </nav>
+
+
+    <main class="container mx-auto px-4">
+
+        <!-- Sección de Portada con Imagen -->
+        <section id="portada" class="pt-24 pb-12 md:pt-32 md:pb-16">
+            <div class="flex justify-center">
+                <img src="https://static.wixstatic.com/media/580988_e4bd8fcb96e84f23bd7aa4a14ad59e89~mv2.png" alt="Imagen de portada" class="max-w-full md:max-w-5xl h-auto rounded-lg">
+            </div>
+        </section>
+
+        <!-- Sección Sobre mí -->
+        <section id="sobre-mi" class="pt-0 pb-12 md:pt-0 md:pb-20">
+            <h2 class="font-cherry-bomb text-3xl md:text-4xl font-bold text-center mb-12 text-white">SOBRE MÍ</h2>
+            
+            <!-- Apartado 1: Foto y Presentación -->
+            <div class="flex flex-col md:flex-row items-center justify-center max-w-4xl mx-auto space-y-8 md:space-y-0 md:space-x-12 mb-16">
+                <img src="https://static.wixstatic.com/media/580988_25e9260fcf93460d976aa7fc45a2908e~mv2.jpeg" alt="Mi foto de perfil" class="w-48 h-48 md:w-64 md:h-64 rounded-full shadow-xl object-cover">
+                <div class="text-left">
+                    <h3 class="font-cherry-bomb text-2xl font-semibold text-white mb-4">Diseñadora de Arte Digital</h3>
+                    <p class="text-lg text-gray-300">
+                        Enfocada en construir identidades de marca y contenido para redes sociales. Mi experiencia se centra en ayudar a las marcas a fortalecer su presencia online a través de soluciones visuales efectivas. Ahora busco un nuevo reto profesional en un equipo donde pueda aportar mi creatividad y crecer junto a ellos.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Apartado 2: Habilidades y Aptitudes -->
+            <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 max-w-4xl mx-auto mb-16">
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    <!-- Columna de Habilidades -->
+                    <div class="text-white md:border-r md:border-white/20 md:pr-12">
+                        <h4 class="font-cherry-bomb text-2xl mb-6 uppercase">Habilidades</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Contenido en Redes Sociales</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Producción Audiovisual</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Motion Graphics</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Branding</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Páginas Web (IA)</span>
+                            </li>
+                             <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Imágenes con IA</span>
+                            </li>
+                             <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Videos con IA</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Columna de Aptitudes -->
+                    <div class="text-white md:pl-12">
+                        <h4 class="font-cherry-bomb text-2xl mb-6 uppercase">Aptitudes</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Creativa</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Responsable</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Pensamiento Crítico</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Trabajo en Equipo</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Autodidacta</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- INICIO: Sección de Línea de Tiempo (Herramientas) -->
+            
+            <!-- Vista para Escritorio -->
+            <div class="max-w-5xl mx-auto mt-16 px-4 hidden md:block">
+                <div class="flex flex-row flex-nowrap items-start justify-center overflow-x-auto pb-4">
+                    <!-- Herramienta 1: Photoshop -->
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="flex flex-col items-center w-24 text-center">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <img src="https://static.wixstatic.com/media/580988_e3e0d60e1b3c4a9aa2971086b56ef870~mv2.png" alt="Logo de Photoshop" class="w-8 h-8">
+                            </div>
+                            <p class="mt-2 text-xs text-white">Photoshop</p>
+                        </div>
+                        <div class="w-6 h-0.5 bg-white/30 mb-8"></div>
+                    </div>
+                    <!-- Herramienta 2: Illustrator -->
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="flex flex-col items-center w-24 text-center">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <img src="https://static.wixstatic.com/media/580988_1577419728b240a585ab2f9341b4a9a4~mv2.png" alt="Logo de Illustrator" class="w-8 h-8">
+                            </div>
+                            <p class="mt-2 text-xs text-white">Illustrator</p>
+                        </div>
+                        <div class="w-6 h-0.5 bg-white/30 mb-8"></div>
+                    </div>
+                    <!-- Herramienta 3: After Effects -->
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="flex flex-col items-center w-24 text-center">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <img src="https://static.wixstatic.com/media/580988_385c824420a34cc4b4f1a80263381b04~mv2.png" alt="Logo de After Effects" class="w-8 h-8">
+                            </div>
+                            <p class="mt-2 text-xs text-white">After Effects</p>
+                        </div>
+                        <div class="w-6 h-0.5 bg-white/30 mb-8"></div>
+                    </div>
+                    <!-- Herramienta 4: Audacity -->
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="flex flex-col items-center w-24 text-center">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <img src="https://static.wixstatic.com/media/580988_346eb58f0101411c8f13f9f7336492e1~mv2.png" alt="Logo de Audacity" class="w-8 h-8">
+                            </div>
+                            <p class="mt-2 text-xs text-white">Audacity</p>
+                        </div>
+                        <div class="w-6 h-0.5 bg-white/30 mb-8"></div>
+                    </div>
+                    <!-- Herramienta 5: Gemini -->
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="flex flex-col items-center w-24 text-center">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <img src="https://static.wixstatic.com/media/580988_2692e165b00c4902adec46960836f1ba~mv2.png" alt="Logo de Gemini" class="w-8 h-8">
+                            </div>
+                            <p class="mt-2 text-xs text-white">Gemini</p>
+                        </div>
+                        <div class="w-6 h-0.5 bg-white/30 mb-8"></div>
+                    </div>
+                    <!-- Herramienta 6: Google Labs -->
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="flex flex-col items-center w-24 text-center">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <img src="https://static.wixstatic.com/media/580988_1f825cdfd7574ffd91baf50a4154e8e7~mv2.png" alt="Logo de Google Labs" class="w-8 h-8">
+                            </div>
+                            <p class="mt-2 text-xs text-white">Google Labs</p>
+                        </div>
+                        <div class="w-6 h-0.5 bg-white/30 mb-8"></div>
+                    </div>
+                    <!-- Herramienta 7: Stable Diffusion -->
+                    <div class="flex items-center flex-shrink-0">
+                        <div class="flex flex-col items-center w-24 text-center">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <img src="https://static.wixstatic.com/media/580988_12250d1f1a7148fd96ef9d787a05895e~mv2.png" alt="Logo de Stable Diffusion" class="w-8 h-8">
+                            </div>
+                            <p class="mt-2 text-xs text-white">Stable Diffusion</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista para Móvil -->
+            <div class="max-w-5xl mx-auto mt-16 px-4 md:hidden">
+                <!-- Fila Superior -->
+                <div class="flex justify-around items-center">
+                    <!-- Photoshop -->
+                    <div class="flex flex-col items-center w-20 text-center">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <img src="https://static.wixstatic.com/media/580988_e3e0d60e1b3c4a9aa2971086b56ef870~mv2.png" alt="Logo de Photoshop" class="w-8 h-8">
+                        </div>
+                        <p class="mt-2 text-xs text-white">Photoshop</p>
+                    </div>
+                    <!-- Illustrator -->
+                    <div class="flex flex-col items-center w-20 text-center">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <img src="https://static.wixstatic.com/media/580988_1577419728b240a585ab2f9341b4a9a4~mv2.png" alt="Logo de Illustrator" class="w-8 h-8">
+                        </div>
+                        <p class="mt-2 text-xs text-white">Illustrator</p>
+                    </div>
+                    <!-- After Effects -->
+                    <div class="flex flex-col items-center w-20 text-center">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <img src="https://static.wixstatic.com/media/580988_385c824420a34cc4b4f1a80263381b04~mv2.png" alt="Logo de After Effects" class="w-8 h-8">
+                        </div>
+                        <p class="mt-2 text-xs text-white">After Effects</p>
+                    </div>
+                    <!-- Audacity -->
+                    <div class="flex flex-col items-center w-20 text-center">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <img src="https://static.wixstatic.com/media/580988_346eb58f0101411c8f13f9f7336492e1~mv2.png" alt="Logo de Audacity" class="w-8 h-8">
+                        </div>
+                        <p class="mt-2 text-xs text-white">Audacity</p>
+                    </div>
+                </div>
+                <!-- Fila Inferior -->
+                <div class="flex justify-around items-center mt-6">
+                    <!-- Gemini -->
+                    <div class="flex flex-col items-center w-20 text-center">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <img src="https://static.wixstatic.com/media/580988_2692e165b00c4902adec46960836f1ba~mv2.png" alt="Logo de Gemini" class="w-8 h-8">
+                        </div>
+                        <p class="mt-2 text-xs text-white">Gemini</p>
+                    </div>
+                    <!-- Google Labs -->
+                    <div class="flex flex-col items-center w-20 text-center">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <img src="https://static.wixstatic.com/media/580988_1f825cdfd7574ffd91baf50a4154e8e7~mv2.png" alt="Logo de Google Labs" class="w-8 h-8">
+                        </div>
+                        <p class="mt-2 text-xs text-white">Google Labs</p>
+                    </div>
+                    <!-- Stable Diffusion -->
+                    <div class="flex flex-col items-center w-20 text-center">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <img src="https://static.wixstatic.com/media/580988_12250d1f1a7148fd96ef9d787a05895e~mv2.png" alt="Logo de Stable Diffusion" class="w-8 h-8">
+                        </div>
+                        <p class="mt-2 text-xs text-white">Stable Diffusion</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FIN: Nueva Sección de Línea de Tiempo -->
+
+        </section>
+
+        <!-- Sección de Proyectos -->
+        <section id="proyectos" class="pt-12 pb-20 md:pt-16 md:pb-28">
+            <h2 class="font-cherry-bomb text-3xl md:text-4xl font-bold text-center mb-12 text-white uppercase">PROYECTOS</h2>
+            
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 justify-items-center">
+                    
+                    <!-- Tarjeta de Proyecto 1 -->
+                    <div id="okatek" class="bg-white/10 backdrop-blur-xl rounded-full px-6 pt-12 pb-16 text-center text-white flex flex-col items-center shadow-lg w-full max-w-xs border border-white/20">
+                        <div class="w-52 h-52 bg-cover bg-center rounded-full mb-6 flex-shrink-0" style="background-image: url('https://static.wixstatic.com/media/580988_43afa5b185d9410aa5c73689e3034a6b~mv2.png')"></div>
+                        <div class="flex flex-col justify-center">
+                            <h3 class="font-cherry-bomb text-2xl font-bold my-2">OKATEK</h3>
+                            <p class="text-gray-300 text-sm mb-4">Como diseñador, mi trabajo consistió en el desarrollo integral de la identidad visual de la marca...</p>
+                            <a href="okatek/" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-2 rounded-full transition-colors duration-300">
+                               Ver más
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Proyecto 2 -->
+                    <div id="eldepci" class="bg-white/10 backdrop-blur-xl rounded-full px-6 pt-12 pb-16 text-center text-white flex flex-col items-center shadow-lg w-full max-w-xs border border-white/20">
+                        <div class="w-52 h-52 bg-cover bg-center rounded-full mb-6 flex-shrink-0" style="background-image: url('https://static.wixstatic.com/media/580988_ef8523cf6a0b417087ab03befd295652~mv2.png')"></div>
+                        <div class="flex flex-col justify-center">
+                            <h3 class="font-cherry-bomb text-2xl font-bold my-2">ELDEPCI</h3>
+                            <p class="text-gray-300 text-sm mb-4">En colaboración con el equipo de marketing, desarrollé una estrategia de contenido en redes sociales centrada en...</p>
+                            <a href="eldepci/" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-2 rounded-full transition-colors duration-300">
+                                Ver más
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Proyecto 3 -->
+                    <div id="impulso" class="bg-white/10 backdrop-blur-xl rounded-full px-6 pt-12 pb-16 text-center text-white flex flex-col items-center shadow-lg w-full max-w-xs border border-white/20">
+                        <div class="w-52 h-52 bg-cover bg-center rounded-full mb-6 flex-shrink-0" style="background-image: url('https://static.wixstatic.com/media/580988_28e980a435c5413eb60d6e73565d9f38~mv2.png')"></div>
+                        <div class="flex flex-col justify-center">
+                            <h3 class="font-cherry-bomb text-2xl font-bold my-2">IMPULSO</h3>
+                            <p class="text-gray-300 text-sm mb-4">El reto consistió en alinear la imagen de una agencia galardonada con su reputación...</p>
+                            <a href="impulso/" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-2 rounded-full transition-colors duration-300">
+                                Ver más
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor para las dos últimas tarjetas -->
+                    <div class="md:col-span-3 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
+                        <!-- Tarjeta de Marca 1 -->
+                        <div id="core" class="bg-white/10 backdrop-blur-xl rounded-full px-6 pt-12 pb-16 text-center text-white flex flex-col items-center shadow-lg w-full max-w-xs border border-white/20">
+                            <div class="w-52 h-52 bg-cover bg-center rounded-full mb-6 flex-shrink-0" style="background-image: url('https://static.wixstatic.com/media/580988_d62aed6ceae34f959f3493ce74e28ae2~mv2.png')"></div>
+                            <div class="flex flex-col justify-center">
+                                <h3 class="font-cherry-bomb text-2xl font-bold my-2">CORE</h3>
+                                <p class="text-gray-300 text-sm mb-4">Creando contenido visual que generara engagement y educara a los potenciales clientes sobre la propuesta de valor de la empresa...</p>
+                                <a href="core/" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-2 rounded-full transition-colors duration-300">
+                                    Ver más
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta de Marca 2 -->
+                        <div id="arago" class="bg-white/10 backdrop-blur-xl rounded-full px-6 pt-12 pb-16 text-center text-white flex flex-col items-center shadow-lg w-full max-w-xs border border-white/20">
+                            <div class="w-52 h-52 bg-cover bg-center rounded-full mb-6 flex-shrink-0" style="background-image: url('https://static.wixstatic.com/media/580988_709d1d59a79f4d748c83450d04fabc0f~mv2.png')"></div>
+                            <div class="flex flex-col justify-center">
+                                <h3 class="font-cherry-bomb text-2xl font-bold my-2">ARAGO</h3>
+                                <p class="text-gray-300 text-sm mb-4">La marca adquirió una imagen cohesiva y de alta gama, elevando su percepción...</p>
+                                <a href="arago/" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-2 rounded-full transition-colors duration-300">
+                                   Ver más
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Sección de Contacto -->
+        <section id="contacto" class="pt-12 pb-20 md:pt-16 md:pb-28 text-center">
+            <h2 class="font-cherry-bomb text-3xl md:text-4xl font-bold mb-8 text-white uppercase">Contacto</h2>
+            <p class="text-lg max-w-2xl mx-auto mb-6 text-gray-300">
+                Siempre estoy abierto a nuevas proyectos. Si buscas un colaborador o tienes una oportunidad que se alinee con mi trabajo, envíame un mensaje. <b>¡Construyamos en grande!</b>
+            </p>
+            <div class="flex justify-center space-x-4">
+                <a href="mailto:rospalma1031@gmail.com" class="bg-[#29287B] text-white font-semibold py-3 px-6 rounded-full hover:bg-[#3E3C8B] transition-colors duration-300">
+                    Enviar Correo
+                </a>
+                <a href="https://api.whatsapp.com/send/?phone=7221121527&text&type=phone_number&app_absent=0" target="_blank" class="bg-green-500 text-white font-semibold py-3 px-6 rounded-full hover:bg-green-600 transition-colors duration-300">
+                    WhatsApp
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pie de página (Footer) -->
+    <footer class="text-center py-6 border-t border-gray-700">
+        <p class="text-sm text-gray-400">© 2024 Mi Portafolio Artístico. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Script de JavaScript para la interactividad y el fondo dinámico -->
+    <script>
+        // Cierra el menú móvil al hacer clic en un enlace
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.add('hidden');
+            mobileMenu.classList.remove('flex');
+            // También oculta el submenú de proyectos si está abierto
+            const mobileSubMenu = document.getElementById('proyectos-mobile-submenu');
+            mobileSubMenu.classList.add('hidden');
+        }
+
+        window.onload = function() {
+            // --- LÓGICA DEL MENÚ ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const closeMenuButton = document.getElementById('close-menu-button');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('flex');
+            });
+
+            closeMenuButton.addEventListener('click', () => {
+                closeMobileMenu();
+            });
+
+            // --- LÓGICA DEL MENÚ DESPLEGABLE (ESCRITORIO) ---
+            const desktopToggle = document.getElementById('proyectos-desktop-toggle');
+            const desktopSubMenu = document.getElementById('proyectos-desktop-submenu');
+
+            desktopToggle.addEventListener('click', (event) => {
+                // Previene que el clic en el enlace principal cierre el menú inmediatamente
+                event.stopPropagation();
+                desktopSubMenu.classList.toggle('hidden');
+            });
+            
+            // Cierra el submenú de escritorio si se hace clic fuera de él
+            window.addEventListener('click', () => {
+                if (!desktopSubMenu.classList.contains('hidden')) {
+                    desktopSubMenu.classList.add('hidden');
+                }
+            });
+
+            // --- LÓGICA DEL MENÚ DESPLEGABLE (MÓVIL) ---
+            const mobileToggle = document.getElementById('proyectos-mobile-toggle');
+            const mobileSubMenu = document.getElementById('proyectos-mobile-submenu');
+
+            mobileToggle.addEventListener('click', (event) => {
+                event.preventDefault();
+                mobileSubMenu.classList.toggle('hidden');
+            });
+
+
+            // --- LÓGICA DEL FONDO ---
+            const canvas = document.getElementById('background-canvas');
+            const ctx = canvas.getContext('2d');
+            const particles = [];
+            const particleCount = 10;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                init();
+            }
+            window.addEventListener('resize', resizeCanvas);
+            
+            function getRandomColor() {
+                const colors = [[204, 163, 197], [97, 46, 122], [100, 176, 217], [41, 40, 123]];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                return `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)`;
+            }
+
+            function createParticle() {
+                const radius = Math.random() * 80 + 150;
+                return {
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 1, vy: (Math.random() - 0.5) * 1,
+                    color: getRandomColor(), radius: radius, targetRadius: radius,
+                    expansionFactor: 1.5, smoothFactor: 0.05
+                };
+            }
+
+            function init() {
+                particles.length = 0;
+                for (let i = 0; i < particleCount; i++) particles.push(createParticle());
+            }
+
+            function drawParticle(p) {
+                ctx.beginPath();
+                const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+                gradient.addColorStop(0, `rgba(255, 255, 255, 0.4)`);
+                gradient.addColorStop(0.5, p.color);
+                gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
+                ctx.fillStyle = gradient;
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p) => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < -p.radius) p.x = canvas.width + p.radius;
+                    if (p.x > canvas.width + p.radius) p.x = -p.radius;
+                    if (p.y < -p.radius) p.y = canvas.height + p.radius;
+                    if (p.y > canvas.height + p.radius) p.y = -p.radius;
+                    drawParticle(p);
+                });
+            }
+
+            resizeCanvas();
+            animate();
+        };
+    </script>
+
+</body>
+</html>
+
