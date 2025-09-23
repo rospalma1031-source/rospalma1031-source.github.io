@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio Artístico</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Lato', sans-serif;
+            color: #2d3748; /* Color de texto oscuro para buen contraste */
+            overflow-x: hidden; /* Evita el scroll horizontal */
+            /* Degradado de fondo con la nueva paleta de colores OSCURA */
+            background-color: #1a1a2e; /* Azul noche muy oscuro */
+            background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
+                              radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+        }
+        
+        /* Estilos para el canvas de fondo */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Mueve el canvas al fondo */
+            filter: blur(2px) saturate(1.5);
+        }
+
+        /* Asegura que el contenido esté por encima del fondo */
+        header, main, footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Oculta la navegación del móvil por defecto */
+        #mobile-menu {
+            display: none;
+        }
+
+        /* Usa Cherry Bomb One para títulos y elementos clave */
+        .font-cherry-bomb {
+            font-family: 'Cherry Bomb One', cursive;
+        }
+        
+        /* --- ESTILOS PARA EL CARRUSEL DE PÍLDORAS --- */
+        .pill-carousel-container {
+            position: relative;
+        }
+        .pill-carousel {
+            display: flex;
+            justify-content: center; /* Centra las imágenes en el contenedor */
+            width: 100%;
+            max-width: 1200px; /* Ancho máximo del carrusel */
+            margin: auto;
+            height: 400px; /* Altura del carrusel */
+            gap: 8px; /* Espacio entre elementos */
+        }
+
+        .pill {
+            position: relative;
+            flex: 0 1 80px; /* Estado colapsado */
+            height: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: flex 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .pill:hover {
+            flex: 1 1 500px; /* Estado expandido */
+            background-color: transparent; /* El fondo se vuelve transparente para eliminar el espacio visible */
+        }
+
+        .pill img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* La imagen llena el contenedor, recortándose si es necesario (estado contraído) */
+            object-position: center;
+            filter: grayscale(0.5);
+            transition: filter 0.7s ease;
+        }
+
+        .pill:hover img {
+            object-fit: contain; /* La imagen se muestra completa, ajustándose al contenedor (estado expandido) */
+            filter: grayscale(0);
+        }
+        
+        /* --- ESTILOS PARA EL CARRUSEL DE REELS COVER FLOW --- */
+        .reels-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            perspective: 1200px;
+        }
+        .reels-carousel {
+            position: relative;
+            width: 270px; /* Ancho de la tarjeta del reel (9:16) */
+            height: 480px; /* Altura de la tarjeta del reel */
+            transform-style: preserve-3d;
+        }
+        .reel-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
+            cursor: pointer;
+        }
+        .reel-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .description {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            color: white;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        /* Adaptación para móviles */
+        @media (max-width: 768px) {
+            .pill-carousel, .reels-carousel {
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .pill-carousel {
+                justify-content: flex-start; /* Revierte el centrado para el scroll en móvil */
+            }
+            .pill-carousel::-webkit-scrollbar, .reels-carousel::-webkit-scrollbar {
+                display: none;
+            }
+            .pill, .pill:hover {
+                flex: 0 0 80%;
+                height: 350px;
+                border-radius: 24px;
+                scroll-snap-align: center;
+                background-color: rgba(255, 255, 255, 0.1); /* Restaura el fondo en móvil */
+            }
+            .pill img, .pill:hover img {
+                object-fit: contain; /* En móvil, siempre se muestra la imagen completa */
+                filter: grayscale(0);
+            }
+            .reels-container {
+                perspective: none;
+                min-height: auto;
+            }
+            .reels-carousel {
+                position: static;
+                display: flex;
+                width: 100%;
+                height: auto;
+                padding: 0;
+                gap: 16px;
+            }
+            .reel-card {
+                position: static;
+                flex: 0 0 60%; /* Ancho de la tarjeta de reel en móvil */
+                height: auto;
+                aspect-ratio: 9 / 16;
+                scroll-snap-align: center;
+                transform: none !important;
+                opacity: 1 !important;
+                filter: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <canvas id="background-canvas"></canvas>
+
+    <header id="main-header" class="p-4 md:p-8 flex justify-between items-center fixed top-0 left-0 w-full z-50 bg-white/10 backdrop-blur-lg shadow-md transition-colors duration-300">
+        <a href="../">
+            <img src="https://static.wixstatic.com/media/580988_e4bd8fcb96e84f23bd7aa4a14ad59e89~mv2.png" alt="Logo Mi Portafolio" class="h-10 md:h-12">
+        </a>
+        
+        <nav class="hidden md:block">
+            <ul class="flex items-center space-x-4 md:space-x-8 text-lg font-medium">
+                <li><a href="../#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">SOBRE MI</a></li>
+                <li class="relative">
+                    <a href="../#proyectos" id="proyectos-desktop-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase cursor-pointer">PROYECTOS</a>
+                    <ul id="proyectos-desktop-submenu" class="absolute hidden bg-white/20 backdrop-blur-lg rounded-lg mt-2 py-2 w-48 shadow-lg">
+                        <li><a href="../okatek/" class="block px-4 py-2 text-white hover:bg-white/10">OKATEK</a></li>
+                        <li><a href="../eldepci/" class="block px-4 py-2 text-white hover:bg-white/10">ELDEPCI</a></li>
+                        <li><a href="../core/" class="block px-4 py-2 text-white hover:bg-white/10">CORE</a></li>
+                        <li><a href="../impulso/" class="block px-4 py-2 text-white hover:bg-white/10">IMPULSO</a></li>
+                        <li><a href="../arago/" class="block px-4 py-2 text-white hover:bg-white/10">ARAGO</a></li>
+                    </ul>
+                </li>
+                <li><a href="../#contacto" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">CONTACTO</a></li>
+            </ul>
+        </nav>
+        
+        <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+    </header>
+
+    <nav id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-[#29287B] z-40 p-8 text-center flex flex-col justify-center items-center space-y-8">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-white text-3xl focus:outline-none">&times;</button>
+        <ul class="flex flex-col space-y-8 text-2xl font-medium">
+            <li><a href="../#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">SOBRE MI</a></li>
+            <li>
+                <a href="../#proyectos" id="proyectos-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">PROYECTOS</a>
+                <ul id="proyectos-submenu" class="hidden mt-4 space-y-4 text-xl">
+                    <li><a href="../okatek/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">OKATEK</a></li>
+                    <li><a href="../eldepci/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">ELDEPCI</a></li>
+                    <li><a href="../core/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">CORE</a></li>
+                    <li><a href="../impulso/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">IMPULSO</a></li>
+                    <li><a href="../arago/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">ARAGO</a></li>
+                </ul>
+            </li>
+            <li><a href="../#contacto" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">CONTACTO</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <div class="container mx-auto px-4 pt-24 md:pt-32">
+            
+            <section id="portada" class="mb-16 md:mb-24">
+                <img src="https://static.wixstatic.com/media/580988_571e6cb12e8341c486f7c29fdc845c7c~mv2.png" alt="Imagen de portada de Okatek" class="w-full h-auto rounded-3xl">
+            </section>
+
+            <!-- DESCRIPCION -->
+            <section id="descripcion" class="mb-16 md:mb-24">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 max-w-4xl mx-auto">
+                    <img src="https://static.wixstatic.com/media/580988_f741a6eacc1d42bf823dd8296c7dd87f~mv2.png" alt="Imagen de perfil" class="w-48 md:w-60 h-auto flex-shrink-0">
+                    <p class="text-lg text-center md:text-left">Consolidar la presencia de una marca de decoración de alta gama en un mercado premium, a través de una identidad visual que reflejara su exclusividad y calidad.<br><br>Mi rol fue el diseño integral de la identidad visual de la marca. Adicionalmente, dirigí una sesión fotográfica de producto con enfoque en la estética y el detalle, generando contenido de alta calidad que fue clave para la página web y las plataformas de marketing, ayudando a comunicar el valor de los productos al público objetivo.<br><br>La marca adquirió una imagen cohesiva y de alta gama, elevando su percepción y atrayendo a clientes que valoran el diseño y la calidad.</p>
+                </div>
+            </section>
+
+            <!-- IDENTIDAD VISUAL -->
+            <div class="max-w-4xl mx-auto">
+                <section>
+                     <img src="https://static.wixstatic.com/media/580988_d8a44f080d57414d9902dc39f5ca73f0~mv2.png" alt="Imagen complementaria" class="w-full h-auto rounded-t-3xl">
+                     <img src="https://static.wixstatic.com/media/580988_75b122fe804e4c198fcacff3fe77ffd2~mv2.png" alt="Imagen de Medios Digitales" class="w-full h-auto rounded-b-3xl">
+                </section>
+                
+            </div>
+
+            <!-- INICIO: GALERÍA DE IMÁGENES -->
+            <section id="galeria" class="my-16 md:my-24">
+                <div class="max-w-7xl mx-auto">
+                    <div class="columns-2 md:columns-3 lg:columns-4 gap-2">
+                        <img src="https://static.wixstatic.com/media/580988_d1528f5894924f93b494d117672e6b33~mv2.jpg" alt="Imagen de la galería 1" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_883bf9e8c6254d72b58bd8a28f8fea07~mv2.jpg" alt="Imagen de la galería 2" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_688eff8f718e40d38ddcc22d4bd7cea9~mv2.jpg" alt="Imagen de la galería 3" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_14bbb7678d3945d980cf42453457f563~mv2.jpg" alt="Imagen de la galería 4" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_d099c1d24ada4751976ad273c1e2757c~mv2.jpg" alt="Imagen de la galería 5" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_cd396926770f4a25a6607853893ada7f~mv2.jpg" alt="Imagen de la galería 6" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_1126f3636bd74a9080f29a8e1b8433e3~mv2.jpg" alt="Imagen de la galería 7" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_e2513909b6ad429da65bf7a0bd7cbf14~mv2.jpg" alt="Imagen de la galería 8" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_58811700cd2246bb853a8d0e27bbcac3~mv2.jpg" alt="Imagen de la galería 9" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_bf1425784ece46f69c9cfcdfd4cfc761~mv2.jpg" alt="Imagen de la galería 10" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_97be02f8be294dc3876c176a3f9805f4~mv2.jpg" alt="Imagen de la galería 11" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_9c770bc76fc24f679c2e6774fd9a10a3~mv2.jpg" alt="Imagen de la galería 12" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_55057f5717e64516be18cdd628208cae~mv2.jpg" alt="Imagen de la galería 13" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_b86a366a1a304adc9edd00ec4d99fe7f~mv2.jpg" alt="Imagen de la galería 14" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_fed6be21e0364468899a78b5724e28a6~mv2.jpg" alt="Imagen de la galería 15" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_78442214f4a74d5a861e67786c76eab9~mv2.jpg" alt="Imagen de la galería 16" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_6600171c37104f9caf17e526170babb0~mv2.jpg" alt="Imagen de la galería 17" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_1b1efcbf92fb4a7b90269e054590fec7~mv2.jpg" alt="Imagen de la galería 18" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_0a4a9d37b3724cc3bdd3b0bc9a543656~mv2.jpg" alt="Imagen de la galería 19" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_bf3b93bfa5bf44adaf17f183a73a2259~mv2.jpg" alt="Imagen de la galería 20" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_132e487cda2f4f2c8330756994659e54~mv2.jpg" alt="Imagen de la galería 21" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_bf656fb989f74d41b036a55a3096ecaa~mv2.jpg" alt="Imagen de la galería 22" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_bae9fbbd616c499aa60ec8ab347fde3c~mv2.jpg" alt="Imagen de la galería 23" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_54d7237e05034bacb66d859f996a562b~mv2.jpg" alt="Imagen de la galería 24" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_020ef88177a642a0940a3c5bd76e0f7c~mv2.jpg" alt="Imagen de la galería 25" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_6821a3a4c1bb4ca1affa15f9ad46c278~mv2.jpg" alt="Imagen de la galería 26" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_3089d6d5c5e14e75aef1d22b0c079172~mv2.jpg" alt="Imagen de la galería 27" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_e2d2fc4307284afdbd14d0bc197bf89b~mv2.jpg" alt="Imagen de la galería 28" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                        <img src="https://static.wixstatic.com/media/580988_478a6f619aa04d16bcff10d49223f385~mv2.jpg" alt="Imagen de la galería 29" class="w-full mb-2 grayscale transition-all duration-300 break-inside-avoid-column">
+                    </div>
+                </div>
+            </section>
+            <!-- FIN: GALERÍA DE IMÁGENES -->
+        </div>
+    </main>
+
+    <footer class="text-center py-8">
+        <div class="container mx-auto">
+            <p class="text-sm text-gray-400">© 2024 Mi Portafolio. Todos los derechos reservados.</p>
+            <p class="text-sm text-gray-400">Diseñado y desarrollado con ♥</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- Menú de hamburguesa ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMenuButton = document.getElementById('close-menu-button');
+        mobileMenuButton.addEventListener('click', () => { mobileMenu.style.display = 'flex'; });
+        closeMenuButton.addEventListener('click', () => { mobileMenu.style.display = 'none'; });
+        function closeMobileMenu() { 
+            // Cierra el menú principal, pero no afecta el submenú de proyectos
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.style.display = 'none';
+            }
+        }
+
+        // --- Submenú de proyectos en móvil ---
+        const proyectosToggle = document.getElementById('proyectos-toggle');
+        const proyectosSubmenu = document.getElementById('proyectos-submenu');
+        if(proyectosToggle && proyectosSubmenu) {
+            proyectosToggle.addEventListener('click', (e) => {
+                e.preventDefault(); // Evita que la página salte al ancla '#'
+                proyectosSubmenu.classList.toggle('hidden');
+            });
+        }
+
+        // --- Submenú de proyectos en escritorio ---
+        const proyectosDesktopToggle = document.getElementById('proyectos-desktop-toggle');
+        const proyectosDesktopSubmenu = document.getElementById('proyectos-desktop-submenu');
+
+        if(proyectosDesktopToggle && proyectosDesktopSubmenu) {
+            proyectosDesktopToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                proyectosDesktopSubmenu.classList.toggle('hidden');
+            });
+
+            window.addEventListener('click', (e) => {
+                const isClickInside = proyectosDesktopToggle.parentElement.contains(e.target);
+                if (!isClickInside) {
+                    proyectosDesktopSubmenu.classList.add('hidden');
+                }
+            });
+        }
+
+
+        // --- Carrusel de píldoras en móvil ---
+        const pillCarousel = document.getElementById('pill-carousel');
+        const scrollLeftBtn = document.getElementById('scroll-left-btn');
+        const scrollRightBtn = document.getElementById('scroll-right-btn');
+        if (pillCarousel && scrollLeftBtn && scrollRightBtn) {
+            scrollLeftBtn.addEventListener('click', () => { pillCarousel.scrollBy({ left: -pillCarousel.offsetWidth * 0.8, behavior: 'smooth' }); });
+            scrollRightBtn.addEventListener('click', () => { pillCarousel.scrollBy({ left: pillCarousel.offsetWidth * 0.8, behavior: 'smooth' }); });
+        }
+        
+        // --- Carrusel de Reels ---
+        const reelsCarousel = document.getElementById('reels-carousel');
+        if (reelsCarousel) {
+            // Lógica para Escritorio (Cover Flow)
+            const reelCards = reelsCarousel.querySelectorAll('.reel-card');
+            const prevReelBtn = document.getElementById('prev-reel-btn');
+            const nextReelBtn = document.getElementById('next-reel-btn');
+            const numCards = reelCards.length;
+            let currentIndex = Math.floor(numCards / 2);
+
+            function updateCarouselDesktop() {
+                if (window.innerWidth <= 768) return; // No ejecutar en móvil
+                reelCards.forEach((card, i) => {
+                    let offset = i - currentIndex;
+                    if (offset > numCards / 2) offset -= numCards;
+                    else if (offset < -numCards / 2) offset += numCards;
+
+                    const isCurrent = offset === 0;
+                    const translateX = offset * 50;
+                    const scale = isCurrent ? 1 : 0.8;
+                    const rotateY = offset * -15;
+                    const zIndex = 100 - Math.abs(offset);
+                    const opacity = isCurrent ? 1 : 0.5;
+                    const filter = isCurrent ? 'blur(0px)' : 'blur(4px)';
+
+                    card.style.transform = `translateX(${translateX}%) rotateY(${rotateY}deg) scale(${scale})`;
+                    card.style.zIndex = zIndex;
+                    card.style.opacity = opacity;
+                    card.style.filter = filter;
+                });
+            }
+            
+            if(prevReelBtn && nextReelBtn) {
+                prevReelBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex - 1 + numCards) % numCards;
+                    updateCarouselDesktop();
+                });
+                nextReelBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex + 1) % numCards;
+                    updateCarouselDesktop();
+                });
+            }
+
+            // Lógica para Móvil (Scroll horizontal)
+            const prevReelBtnMobile = document.getElementById('prev-reel-btn-mobile');
+            const nextReelBtnMobile = document.getElementById('next-reel-btn-mobile');
+
+            if(prevReelBtnMobile && nextReelBtnMobile){
+                prevReelBtnMobile.addEventListener('click', () => {
+                    const scrollAmount = reelsCarousel.offsetWidth * 0.7;
+                    reelsCarousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                });
+                nextReelBtnMobile.addEventListener('click', () => {
+                    const scrollAmount = reelsCarousel.offsetWidth * 0.7;
+                    reelsCarousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                });
+            }
+            
+            // Inicializa el carrusel de escritorio
+            updateCarouselDesktop();
+        }
+
+
+        // --- Fondo dinámico ---
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const particleCount = 10;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        
+        function getRandomColor() {
+            const colors = [[204, 163, 197], [97, 46, 122], [100, 176, 217], [41, 40, 123]];
+            return `rgba(${colors[Math.floor(Math.random() * colors.length)].join(',')}, 0.3)`;
+        }
+
+        function createParticle() {
+            const radius = Math.random() * 80 + 150;
+            return {
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 1, vy: (Math.random() - 0.5) * 1,
+                color: getRandomColor(), radius: radius, targetRadius: radius,
+                expansionFactor: 1.5, smoothFactor: 0.05
+            };
+        }
+
+        function init() {
+            particles.length = 0;
+            for (let i = 0; i < particleCount; i++) particles.push(createParticle());
+        }
+
+        function drawParticle(p) {
+            ctx.beginPath();
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+            gradient.addColorStop(0, `rgba(255, 255, 255, 0.4)`);
+            gradient.addColorStop(0.5, p.color);
+            gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
+            ctx.fillStyle = gradient;
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < -p.radius) p.x = canvas.width + p.radius;
+                if (p.x > canvas.width + p.radius) p.x = -p.radius;
+                if (p.y < -p.radius) p.y = canvas.height + p.radius;
+                if (p.y > canvas.height + p.radius) p.y = -p.radius;
+                
+                p.radius += (p.targetRadius - p.radius) * p.smoothFactor;
+
+                drawParticle(p);
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = function() {
+            resizeCanvas();
+            animate();
+        };
+
+        // --- Efecto de color persistente en la galería ---
+        const galleryImages = document.querySelectorAll('#galeria img');
+        galleryImages.forEach(img => {
+            img.addEventListener('mouseover', () => {
+                img.classList.remove('grayscale');
+            }, { once: true });
+        });
+
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
