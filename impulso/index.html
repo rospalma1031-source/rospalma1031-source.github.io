@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Impulso</title>
+    <title>Proyecto IMPULSO</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,8 @@
             background-color: #1a1a2e; /* Azul noche muy oscuro */
             background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
                               radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+            opacity: 0; /* Opacidad inicial para el fundido de entrada */
+            transition: opacity 0.5s ease-in-out; /* Transición suave */
         }
         
         /* Estilos para el canvas de fondo */
@@ -250,14 +252,39 @@
             requestAnimationFrame(animate);
         }
 
+        // --- Transiciones de página ---
+        // Fundido de entrada al cargar la página
         window.onload = function() {
             resizeCanvas();
             animate();
+            document.body.style.opacity = '1'; // Activa el fundido de entrada
         };
+
+        // Fundido de salida al hacer clic en un enlace
+        document.querySelectorAll('a[href]:not([target="_blank"])').forEach(link => {
+            // Excluir enlaces de control de submenús que ya tienen su propio JS
+            if (link.id === 'proyectos-desktop-toggle' || link.id === 'proyectos-toggle') {
+                return;
+            }
+
+            link.addEventListener('click', function(e) {
+                // Prevenir la navegación inmediata
+                e.preventDefault();
+                
+                const destination = this.href;
+
+                // Iniciar el fundido de salida
+                document.body.style.opacity = '0';
+
+                // Navegar después de que termine la transición
+                setTimeout(() => {
+                    window.location.href = destination;
+                }, 500); // Debe coincidir con la duración de la transición en CSS
+            });
+        });
 
     </script>
 
 </body>
 </html>
-
 
