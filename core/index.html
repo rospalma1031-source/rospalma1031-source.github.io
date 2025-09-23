@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Core</title>
+    <title>Proyecto CORE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,8 @@
             background-color: #1a1a2e; /* Azul noche muy oscuro */
             background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
                               radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+            opacity: 0; /* Inicialmente invisible para la transición de entrada */
+            transition: opacity 0.5s ease-in-out; /* Duración de la transición de fundido */
         }
         
         /* Estilos para el canvas de fondo */
@@ -284,6 +286,41 @@
 
 
     <script>
+        // --- Transición de Fundido (Fade) ---
+        // Se ejecuta cuando la página ha cargado para iniciar el fundido de entrada.
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+
+        // Agrega un listener a todos los enlaces para el fundido de salida.
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                const target = this.getAttribute('target');
+
+                // Aplica el efecto solo si el enlace no es un ancla y no abre en una nueva pestaña.
+                if (href && !href.startsWith('#') && target !== '_blank') {
+                    // Verificamos si el enlace es interno
+                    const url = new URL(href, window.location.origin);
+                    if (url.hostname === window.location.hostname) {
+                        e.preventDefault(); // Previene la navegación inmediata.
+                        document.body.style.opacity = '0'; // Inicia la transición de salida.
+                        // Espera a que termine la animación antes de cambiar de página.
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 500); // 500ms, igual que la duración de la transición en CSS.
+                    }
+                }
+            });
+        });
+
+        // Maneja el caché de retroceso/avance (bfcache) para asegurar que la página sea visible.
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                document.body.style.opacity = '1';
+            }
+        });
+
         // --- Menú de hamburguesa ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
