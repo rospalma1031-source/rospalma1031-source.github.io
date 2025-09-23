@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio Artístico</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Lato', sans-serif;
+            color: #2d3748; /* Color de texto oscuro para buen contraste */
+            overflow-x: hidden; /* Evita el scroll horizontal */
+            /* Degradado de fondo con la nueva paleta de colores OSCURA */
+            background-color: #1a1a2e; /* Azul noche muy oscuro */
+            background-image: radial-gradient(at 0% 100%, #4a235a, transparent), /* Morado oscuro */
+                              radial-gradient(at 100% 0%, #1f4068, transparent); /* Azul oscuro */
+        }
+        
+        /* Estilos para el canvas de fondo */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Mueve el canvas al fondo */
+            filter: blur(2px) saturate(1.5);
+        }
+
+        /* Asegura que el contenido esté por encima del fondo */
+        header, main, footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Oculta la navegación del móvil por defecto */
+        #mobile-menu {
+            display: none;
+        }
+
+        /* Usa Cherry Bomb One para títulos y elementos clave */
+        .font-cherry-bomb {
+            font-family: 'Cherry Bomb One', cursive;
+        }
+        
+        /* --- ESTILOS PARA EL CARRUSEL DE PÍLDORAS (SIMPLIFICADO) --- */
+        .pill-carousel-container {
+            position: relative;
+        }
+        .pill-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Oculta la barra de scroll */
+            gap: 16px;
+            padding: 0 16px;
+        }
+        .pill-carousel::-webkit-scrollbar {
+            display: none; /* Oculta la barra de scroll en Webkit */
+        }
+
+        .pill {
+            flex: 0 0 80%; /* Ancho de cada item en móvil */
+            /* Se elimina la altura fija para que el contenedor se ajuste a la imagen */
+            border-radius: 24px;
+            scroll-snap-align: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .pill {
+                flex: 0 0 45%; /* Ancho de cada item en escritorio */
+            }
+        }
+
+        .pill img {
+            width: 100%;
+            height: auto; /* La altura se ajusta para mantener la proporción de la imagen */
+            display: block;
+        }
+        
+        /* --- ESTILOS PARA EL CARRUSEL DE REELS COVER FLOW --- */
+        .reels-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            perspective: 1200px;
+        }
+        .reels-carousel {
+            position: relative;
+            width: 270px; /* Ancho de la tarjeta del reel (9:16) */
+            height: 480px; /* Altura de la tarjeta del reel */
+            transform-style: preserve-3d;
+        }
+        .reel-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
+            cursor: pointer;
+        }
+        .reel-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .description {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            color: white;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        /* Adaptación para móviles */
+        @media (max-width: 768px) {
+            .reels-carousel {
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                justify-content: flex-start;
+            }
+             .reels-carousel::-webkit-scrollbar {
+                display: none;
+            }
+            .reels-container {
+                perspective: none;
+                min-height: auto;
+            }
+            .reels-carousel {
+                position: static;
+                display: flex;
+                width: 100%;
+                height: auto;
+                padding: 0 16px;
+                gap: 16px;
+            }
+            .reel-card {
+                position: relative; /* Cambiado de static a relative */
+                flex: 0 0 60%; /* Ancho de la tarjeta de reel en móvil */
+                height: auto;
+                aspect-ratio: 9 / 16;
+                scroll-snap-align: center;
+                transform: none !important;
+                opacity: 1 !important;
+                filter: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <canvas id="background-canvas"></canvas>
+
+    <header id="main-header" class="p-4 md:p-8 flex justify-between items-center fixed top-0 left-0 w-full z-50 bg-white/10 backdrop-blur-lg shadow-md transition-colors duration-300">
+        <a href="../">
+        <img src="https://static.wixstatic.com/media/580988_e4bd8fcb96e84f23bd7aa4a14ad59e89~mv2.png" alt="Logo Mi Portafolio" class="h-10 md:h-12">
+    </a>
+        
+        <nav class="hidden md:block">
+            <ul class="flex items-center space-x-4 md:space-x-8 text-lg font-medium">
+                <li><a href="../#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">SOBRE MI</a></li>
+                <li class="relative">
+                    <a href="../#proyectos" id="proyectos-desktop-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase cursor-pointer">PROYECTOS</a>
+                    <ul id="proyectos-desktop-submenu" class="absolute hidden bg-white/20 backdrop-blur-lg rounded-lg mt-2 py-2 w-48 shadow-lg">
+                        <li><a href="../okatek/" class="block px-4 py-2 text-white hover:bg-white/10">OKATEK</a></li>
+                        <li><a href="../eldepci/" class="block px-4 py-2 text-white hover:bg-white/10">ELDEPCI</a></li>
+                        <li><a href="../core/" class="block px-4 py-2 text-white hover:bg-white/10">CORE</a></li>
+                        <li><a href="../impulso/" class="block px-4 py-2 text-white hover:bg-white/10">IMPULSO</a></li>
+                        <li><a href="../arago/" class="block px-4 py-2 text-white hover:bg-white/10">ARAGO</a></li>
+                    </ul>
+                </li>
+                <li><a href="../#contacto" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">CONTACTO</a></li>
+            </ul>
+        </nav>
+        
+        <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+    </header>
+
+    <nav id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-[#29287B] z-40 p-8 text-center flex flex-col justify-center items-center space-y-8">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-white text-3xl focus:outline-none">&times;</button>
+        <ul class="flex flex-col space-y-8 text-2xl font-medium">
+            <li><a href="../#sobre-mi" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">SOBRE MI</a></li>
+            <li>
+                <a href="../#proyectos" id="proyectos-toggle" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase">PROYECTOS</a>
+                <ul id="proyectos-submenu" class="hidden mt-4 space-y-4 text-xl">
+                    <li><a href="../okatek/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">OKATEK</a></li>
+                    <li><a href="../eldepci/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">ELDEPCI</a></li>
+                    <li><a href="../core/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">CORE</a></li>
+                    <li><a href="../impulso/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">IMPULSO</a></li>
+                    <li><a href="../arago/" class="text-gray-300 hover:text-white" onclick="closeMobileMenu()">ARAGO</a></li>
+                </ul>
+            </li>
+            <li><a href="#" class="text-white hover:text-[#612E7A] transition-colors duration-300 font-cherry-bomb uppercase" onclick="closeMobileMenu()">CONTACTO</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <div class="container mx-auto px-4 pt-24 md:pt-32">
+            
+            <section id="portada" class="mb-16 md:mb-24">
+                <img src="https://static.wixstatic.com/media/580988_571e6cb12e8341c486f7c29fdc845c7c~mv2.png" alt="Imagen de portada de Okatek" class="w-full h-auto rounded-3xl">
+            </section>
+
+            <!-- IDENTIDAD VISUAL -->
+            <section id="descripcion" class="mb-16 md:mb-24">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 max-w-4xl mx-auto">
+                    <img src="https://static.wixstatic.com/media/580988_a470348d2c29472986e897c2af145850~mv2.png" alt="Imagen de perfil" class="w-48 h-48 md:w-60 md:h-60 rounded-full object-contain flex-shrink-0">
+                    <div class="text-lg text-center md:text-left space-y-4">
+                        <p>El desafío era lanzar y posicionar una marca completamente nueva en el mercado. El objetivo principal fue crear una identidad visual que sirviera como pilar para su reconocimiento y credibilidad.</p>
+                        <p>Como diseñador, mi trabajo consistió en el desarrollo integral de la identidad visual de la marca. Colaboré estrechamente con el equipo de marketing para idear y ejecutar una estrategia de contenido en redes sociales, con el fin de generar engagement, educar al nicho de mercado y fortalecer la percepción de marca. Adicionalmente, implementé mejoras constantes en el UI/UX del sitio web para optimizar la experiencia del usuario y los flujos de conversión.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MEDIOS DIGITALES -->
+            <div class="max-w-4xl mx-auto">
+                <section>
+                     <img src="https://static.wixstatic.com/media/580988_5670602205f24f72b03a8ce13aa4505d~mv2.jpg" alt="Imagen complementaria" class="w-full h-auto rounded-t-3xl">
+                     <video class="w-full h-auto rounded-b-3xl" autoplay loop muted playsinline>
+                        <source src="https://video.wixstatic.com/video/580988_8767e13b966d4fa8a93acbba241d0ee1/1080p/mp4/file.mp4" type="video/mp4">
+                        Tu navegador no soporta el tag de video.
+                    </video>
+                </section>
+
+                <!-- Línea divisora -->
+                <div class="w-full border-t-4 border-white/20 my-16 md:my-24"></div>
+
+                <section id="galerias" class="mb-16 md:mb-24">
+                    <img src="https://static.wixstatic.com/media/580988_7754a33e7c854b8794d496715bfb7d12~mv2.png" alt="Título de Galerías" class="w-full h-auto rounded-3xl mb-8">
+                    <div>
+                        <!-- Imágenes para Escritorio -->
+                        <img src="https://static.wixstatic.com/media/580988_c531bdb31f4f461e88695e62d1fa821d~mv2.png" alt="Imagen de Galería para escritorio 1" class="hidden md:block w-full h-auto rounded-3xl mb-2">
+                        <img src="https://static.wixstatic.com/media/580988_41c4d40af0c34de2b0900b6962ae4f50~mv2.png" alt="Imagen de Galería para escritorio 2" class="hidden md:block w-full h-auto rounded-3xl mb-2">
+
+                        <!-- Imágenes para Móvil -->
+                        <img src="https://static.wixstatic.com/media/580988_c515664790e149e8bb3e452e3f7243b9~mv2.png" alt="Imagen de Galería para móvil 1" class="block md:hidden w-full h-auto rounded-3xl mb-2">
+                        <img src="https://static.wixstatic.com/media/580988_6d1818f7ae004f278a6c1d97a55d2019~mv2.png" alt="Imagen de Galería para móvil 2" class="block md:hidden w-full h-auto rounded-3xl mb-2">
+                    </div>
+                </section>
+
+                <section id="carrusel-imagenes" class="mb-16 md:mb-24">
+                     <div class="pill-carousel-container">
+                        <div id="pill-carousel" class="pill-carousel">
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_db5fd27ea38447759313724d91d0964c~mv2.png" alt="Imagen de carrusel 1"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_1a9cb19c38c1473481c474421d2e1d05~mv2.png" alt="Imagen de carrusel 2"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_27ccf3a3a1f042bfb125e29fc8fe824e~mv2.png" alt="Imagen de carrusel 3"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_0b95499856264d1880fde054bfd37db0~mv2.png" alt="Imagen de carrusel 4"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_8c30ec7fa37b4a12af9668e5204c25cd~mv2.png" alt="Imagen de carrusel 5"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_b664a72d57cf447d8ba871164b7db655~mv2.png" alt="Imagen de carrusel 6"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_ed2e81d9811042b8a7bd399d0aed5dbf~mv2.png" alt="Imagen de carrusel 7"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_458e369582314238b6e3585ea635c7fa~mv2.png" alt="Imagen de carrusel 8"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_9c210972ea8c4163beca7ce2ff829231~mv2.png" alt="Imagen de carrusel 9"></div>
+                            <div class="pill"><img src="https://static.wixstatic.com/media/580988_d9593e7761b8462ebba77a0c7e4521d1~mv2.png" alt="Imagen de carrusel 10"></div>
+                        </div>
+                        
+                        <button id="scroll-left-btn" class="absolute top-1/2 left-2 -translate-y-1/2 bg-white/20 p-2 rounded-full z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button id="scroll-right-btn" class="absolute top-1/2 right-2 -translate-y-1/2 bg-white/20 p-2 rounded-full z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                     </div>
+                </section>
+                
+                <section id="reels" class="mb-16 md:mb-24">
+                    <h2 class="font-cherry-bomb text-3xl md:text-4xl text-white text-center mb-8">Reels</h2>
+                    <div class="reels-container">
+                        <div id="reels-carousel" class="reels-carousel">
+                            <div class="reel-card">
+                                <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                    <source src="https://video.wixstatic.com/video/580988_a1cb639fcdb4451d8a3175c704618bcf/1080p/mp4/file.mp4" type="video/mp4">
+                                </video>
+                                <div class="description">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                                    <span>139</span>
+                                </div>
+                            </div>
+                            <div class="reel-card">
+                                <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                    <source src="https://video.wixstatic.com/video/580988_52ff2ccfd96d41a9b06ad266cb1f3116/1080p/mp4/file.mp4" type="video/mp4">
+                                </video>
+                                <div class="description">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                                    <span>225</span>
+                                </div>
+                            </div>
+                            <div class="reel-card">
+                                <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                    <source src="https://video.wixstatic.com/video/580988_56345b67fb844d80bec53ba9191e5257/1080p/mp4/file.mp4" type="video/mp4">
+                                </video>
+                                <div class="description">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                                    <span>893</span>
+                                </div>
+                            </div>
+                            <div class="reel-card">
+                                <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                    <source src="https://video.wixstatic.com/video/580988_6d0dca2c666740cfa9eb7bc4e0e52bb1/1080p/mp4/file.mp4" type="video/mp4">
+                                </video>
+                                <div class="description">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                                    <span>804</span>
+                                </div>
+                            </div>
+                            <div class="reel-card">
+                               <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                    <source src="https://video.wixstatic.com/video/580988_b6f6361531c5451a91253c3548185ed6/1080p/mp4/file.mp4" type="video/mp4">
+                                </video>
+                                <div class="description">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                                    <span>321</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                         <button id="prev-reel-btn-mobile" class="absolute top-1/2 left-2 -translate-y-1/2 bg-white/20 p-2 rounded-full md:hidden z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button id="next-reel-btn-mobile" class="absolute top-1/2 right-2 -translate-y-1/2 bg-white/20 p-2 rounded-full md:hidden z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                    </div>
+                     <div class="hidden md:flex justify-center mt-8 space-x-4">
+                        <button id="prev-reel-btn" class="bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button id="next-reel-btn" class="bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                    </div>
+
+                    <!-- Video Adicional -->
+                    <div class="mt-16 flex justify-center">
+                        <div class="relative w-full max-w-4xl aspect-[16/9] rounded-2xl overflow-hidden">
+                            <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                <source src="https://video.wixstatic.com/video/580988_ffe5ecbe305c467d94a8aecbdbf53b3c/1080p/mp4/file.mp4" type="video/mp4">
+                            </video>
+                            <div class="description">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                                <span>199 mil</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-8">
+        <div class="bg-white/10 backdrop-blur-lg rounded-t-3xl p-6 container mx-auto">
+            <p class="text-sm text-gray-400">© 2024 Mi Portafolio. Todos los derechos reservados.</p>
+            <p class="text-sm text-gray-400">Diseñado y desarrollado con ♥</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- Menú de hamburguesa ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMenuButton = document.getElementById('close-menu-button');
+        mobileMenuButton.addEventListener('click', () => { mobileMenu.style.display = 'flex'; });
+        closeMenuButton.addEventListener('click', () => { mobileMenu.style.display = 'none'; });
+        function closeMobileMenu() { 
+            // Cierra el menú principal, pero no afecta el submenú de proyectos
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.style.display = 'none';
+            }
+        }
+
+        // --- Submenú de proyectos en móvil ---
+        const proyectosToggle = document.getElementById('proyectos-toggle');
+        const proyectosSubmenu = document.getElementById('proyectos-submenu');
+        if(proyectosToggle && proyectosSubmenu) {
+            proyectosToggle.addEventListener('click', (e) => {
+                e.preventDefault(); // Evita que la página salte al ancla '#'
+                proyectosSubmenu.classList.toggle('hidden');
+            });
+        }
+        
+        // --- Submenú de proyectos en Escritorio ---
+        const proyectosDesktopToggle = document.getElementById('proyectos-desktop-toggle');
+        const proyectosDesktopSubmenu = document.getElementById('proyectos-desktop-submenu');
+
+        if (proyectosDesktopToggle && proyectosDesktopSubmenu) {
+            proyectosDesktopToggle.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default link behavior
+                e.stopPropagation(); // Stop the click from bubbling up to the window
+                proyectosDesktopSubmenu.classList.toggle('hidden');
+            });
+
+            // Close the dropdown if clicking anywhere else on the page
+            window.addEventListener('click', () => {
+                if (!proyectosDesktopSubmenu.classList.contains('hidden')) {
+                    proyectosDesktopSubmenu.classList.add('hidden');
+                }
+            });
+        }
+
+
+        // --- Carrusel de píldoras en móvil ---
+        const pillCarousel = document.getElementById('pill-carousel');
+        const scrollLeftBtn = document.getElementById('scroll-left-btn');
+        const scrollRightBtn = document.getElementById('scroll-right-btn');
+        if (pillCarousel && scrollLeftBtn && scrollRightBtn) {
+            scrollLeftBtn.addEventListener('click', () => {
+                 const scrollAmount = pillCarousel.offsetWidth * 0.8;
+                 pillCarousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+            scrollRightBtn.addEventListener('click', () => {
+                const scrollAmount = pillCarousel.offsetWidth * 0.8;
+                pillCarousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+        }
+        
+        // --- Carrusel de Reels ---
+        const reelsCarousel = document.getElementById('reels-carousel');
+        if (reelsCarousel) {
+            // Lógica para Escritorio (Cover Flow)
+            const reelCards = reelsCarousel.querySelectorAll('.reel-card');
+            const prevReelBtn = document.getElementById('prev-reel-btn');
+            const nextReelBtn = document.getElementById('next-reel-btn');
+            const numCards = reelCards.length;
+            let currentIndex = Math.floor(numCards / 2);
+
+            function updateCarouselDesktop() {
+                if (window.innerWidth <= 768) return; // No ejecutar en móvil
+                reelCards.forEach((card, i) => {
+                    let offset = i - currentIndex;
+                    if (offset > numCards / 2) offset -= numCards;
+                    else if (offset < -numCards / 2) offset += numCards;
+
+                    const isCurrent = offset === 0;
+                    const translateX = offset * 50;
+                    const scale = isCurrent ? 1 : 0.8;
+                    const rotateY = offset * -15;
+                    const zIndex = 100 - Math.abs(offset);
+                    const opacity = isCurrent ? 1 : 0.5;
+                    const filter = isCurrent ? 'blur(0px)' : 'blur(4px)';
+
+                    card.style.transform = `translateX(${translateX}%) rotateY(${rotateY}deg) scale(${scale})`;
+                    card.style.zIndex = zIndex;
+                    card.style.opacity = opacity;
+                    card.style.filter = filter;
+                });
+            }
+            
+            if(prevReelBtn && nextReelBtn) {
+                prevReelBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex - 1 + numCards) % numCards;
+                    updateCarouselDesktop();
+                });
+                nextReelBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex + 1) % numCards;
+                    updateCarouselDesktop();
+                });
+            }
+
+            // Lógica para Móvil (Scroll horizontal)
+            const prevReelBtnMobile = document.getElementById('prev-reel-btn-mobile');
+            const nextReelBtnMobile = document.getElementById('next-reel-btn-mobile');
+
+            if(prevReelBtnMobile && nextReelBtnMobile){
+                prevReelBtnMobile.addEventListener('click', () => {
+                    const scrollAmount = reelsCarousel.offsetWidth * 0.7;
+                    reelsCarousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                });
+                nextReelBtnMobile.addEventListener('click', () => {
+                    const scrollAmount = reelsCarousel.offsetWidth * 0.7;
+                    reelsCarousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                });
+            }
+            
+            // Inicializa el carrusel de escritorio
+            updateCarouselDesktop();
+        }
+
+
+        // --- Fondo dinámico ---
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const particleCount = 10;
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        
+        function getRandomColor() {
+            const colors = [[204, 163, 197], [97, 46, 122], [100, 176, 217], [41, 40, 123]];
+            return `rgba(${colors[Math.floor(Math.random() * colors.length)].join(',')}, 0.3)`;
+        }
+
+        function createParticle() {
+            const radius = Math.random() * 80 + 150;
+            return {
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 1, vy: (Math.random() - 0.5) * 1,
+                color: getRandomColor(), radius: radius, targetRadius: radius,
+                expansionFactor: 1.5, smoothFactor: 0.05
+            };
+        }
+
+        function init() {
+            particles.length = 0;
+            for (let i = 0; i < particleCount; i++) particles.push(createParticle());
+        }
+
+        function drawParticle(p) {
+            ctx.beginPath();
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+            gradient.addColorStop(0, `rgba(255, 255, 255, 0.4)`);
+            gradient.addColorStop(0.5, p.color);
+            gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
+            ctx.fillStyle = gradient;
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < -p.radius) p.x = canvas.width + p.radius;
+                if (p.x > canvas.width + p.radius) p.x = -p.radius;
+                if (p.y < -p.radius) p.y = canvas.height + p.radius;
+                if (p.y > canvas.height + p.radius) p.y = -p.radius;
+                
+                p.radius += (p.targetRadius - p.radius) * p.smoothFactor;
+
+                drawParticle(p);
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = function() {
+            resizeCanvas();
+            animate();
+        };
+
+    </script>
+
+</body>
+</html>
+
+
